@@ -1,0 +1,61 @@
+package com.finance_tracker.authentication;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finance_tracker.exception.InvalidOrExpiredToken;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import java.security.Key;
+import java.util.Date;
+
+@Service
+public class JwtService {
+
+    @Value("${JWT_SECRET_KEY}")
+    private String SECRET_KEY;
+
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+
+    public String generateToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String extractEmail(String token) {
+        try {
+            return this.parseClaims(token).getSubject();
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOrExpiredToken(e.getMessage());
+        }
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+}
