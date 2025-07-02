@@ -1,7 +1,7 @@
 package com.finance_tracker.authentication;
 
-import com.finance_tracker.authentication.dto.LoginRequest;
-import com.finance_tracker.exception.PasswordNotMatchedException;
+import com.finance_tracker.dto.requests.LoginRequest;
+import com.finance_tracker.exception.authentication.PasswordNotMatchedException;
 import com.finance_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

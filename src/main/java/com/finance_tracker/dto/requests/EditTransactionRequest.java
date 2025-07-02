@@ -4,20 +4,16 @@ import com.finance_tracker.enums.TransactionCategory;
 import com.finance_tracker.enums.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-public class CreateTransactionRequest {
-
-    @NotNull
+public class EditTransactionRequest {
     private TransactionType type;
 
-    @NotNull
     private TransactionCategory category;
 
     @PositiveOrZero
@@ -25,5 +21,4 @@ public class CreateTransactionRequest {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date date;
-
 }

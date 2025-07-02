@@ -1,6 +1,6 @@
 package com.finance_tracker.exception;
 
-import lombok.Data;
+import com.finance_tracker.exception.http.HttpException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;

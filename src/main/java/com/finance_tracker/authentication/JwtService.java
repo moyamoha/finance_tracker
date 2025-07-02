@@ -1,7 +1,7 @@
 package com.finance_tracker.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finance_tracker.exception.InvalidOrExpiredToken;
+import com.finance_tracker.exception.authentication.InvalidOrExpiredToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,8 @@ public class JwtService {
             return this.parseClaims(token).getSubject();
         } catch (IllegalArgumentException e) {
             throw new InvalidOrExpiredToken(e.getMessage());
+        } catch (JwtException e) {
+            throw new InvalidOrExpiredToken("Invalid or expired tokens");
         }
     }
 

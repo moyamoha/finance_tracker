@@ -1,7 +1,7 @@
 package com.finance_tracker.controller;
 
 import com.finance_tracker.authentication.AuthenticationService;
-import com.finance_tracker.authentication.dto.LoginRequest;
+import com.finance_tracker.dto.requests.LoginRequest;
 import com.finance_tracker.dto.requests.CreateUserRequest;
 import com.finance_tracker.entity.User;
 import com.finance_tracker.mapper.UserMapper;
@@ -27,7 +27,7 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest dto) {
+    public String login(@RequestBody @Valid LoginRequest dto) {
         logger.info(dto.getEmail());
         return authService.login(dto);
     }

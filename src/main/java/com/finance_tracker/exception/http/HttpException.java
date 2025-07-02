@@ -1,5 +1,7 @@
-package com.finance_tracker.exception;
+package com.finance_tracker.exception.http;
 
+import com.finance_tracker.exception.ApiError;
+import com.finance_tracker.exception.UserReadableHttpException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatusCode;

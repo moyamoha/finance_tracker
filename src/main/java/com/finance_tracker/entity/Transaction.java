@@ -1,5 +1,6 @@
 package com.finance_tracker.entity;
 
+import com.finance_tracker.dto.requests.EditTransactionRequest;
 import com.finance_tracker.enums.TransactionCategory;
 import com.finance_tracker.enums.TransactionType;
 import jakarta.persistence.*;
@@ -60,5 +61,12 @@ public class Transaction {
         if (date == null) {
             date = new Date();
         }
+    }
+
+    public void updateFromDto(EditTransactionRequest dto) {
+        if (dto.getCategory() != null) { this.setCategory(dto.getCategory()); }
+        if (dto.getDate() != null) { this.setDate(dto.getDate()); }
+        if (dto.getAmount() != null) { this.setAmount(dto.getAmount()); }
+        if (dto.getType() != null) { this.setType(dto.getType()); }
     }
 }
