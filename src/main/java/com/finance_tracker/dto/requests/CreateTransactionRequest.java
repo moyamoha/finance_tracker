@@ -2,6 +2,8 @@ package com.finance_tracker.dto.requests;
 
 import com.finance_tracker.enums.TransactionCategory;
 import com.finance_tracker.enums.TransactionType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
@@ -22,10 +24,11 @@ public class CreateTransactionRequest {
 
     private String description;
 
+    @NotNull
     @PositiveOrZero
     private BigDecimal amount;
 
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date date;
-
 }

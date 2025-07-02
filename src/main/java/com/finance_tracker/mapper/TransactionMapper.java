@@ -7,6 +7,7 @@ import com.finance_tracker.entity.Transaction;
 import com.finance_tracker.entity.User;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class TransactionMapper {
         List<SingleTransactionResponse> content = pagedResponse.stream().map(TransactionMapper::toResponse).toList();
         return new TransactionCollectionResponse(
                 content,
-                pagedResponse.getNumberOfElements(),
+                pagedResponse.getTotalElements(),
                 pagedResponse.getNumber() + 1,
                 pagedResponse.getSize(),
                 pagedResponse.isLast()

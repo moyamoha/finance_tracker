@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TransactionCollectionResponse {
     private List<SingleTransactionResponse> content;
-    private int totalElements;
+    private long totalElements;
     private int page;
     private int size;
     private boolean isLast;

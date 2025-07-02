@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class LoginRequest {
+    @NotBlank
     @Email(message = "Invalid email format")
     private String email;
 

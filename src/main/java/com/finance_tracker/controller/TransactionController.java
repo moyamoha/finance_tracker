@@ -8,10 +8,12 @@ import com.finance_tracker.dto.responses.SingleTransactionResponse;
 import com.finance_tracker.dto.responses.TransactionCollectionResponse;
 import com.finance_tracker.entity.Transaction;
 import com.finance_tracker.entity.User;
+import com.finance_tracker.exception.http.HttpException;
 import com.finance_tracker.exception.http.ItemNotFoundException;
 import com.finance_tracker.mapper.TransactionMapper;
 import com.finance_tracker.repository.TransactionRepository;
 import com.finance_tracker.repository.TransactionSpecification;
+import com.finance_tracker.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,15 +26,10 @@ import java.util.UUID;
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
-    public TransactionController(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
-    }
-
-    private Transaction getUserTransactionOrThrow(User user, UUID id) {
-        return transactionRepository.getTransactionsByUserAndId(user, id)
-                .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/")
@@ -41,15 +38,7 @@ public class TransactionController {
             @ModelAttribute TransactionFilterRequest filter,
             Pageable pageable
     ) {
-        Specification<Transaction> spec = Specification.allOf(
-                TransactionSpecification.hasUserId(user.getId()),
-                filter.getType() != null ? TransactionSpecification.hasType(filter.getType()) : null,
-                filter.getMinAmount() != null ? TransactionSpecification.amountGreaterThanOrEqual(filter.getMinAmount()) : null,
-                filter.getMaxAmount() != null ? TransactionSpecification.amountLessThanOrEqual(filter.getMaxAmount()) : null,
-                filter.getStartDate() != null ? TransactionSpecification.dateAfter(filter.getStartDate()) : null,
-                filter.getEndDate() != null ? TransactionSpecification.dateBefore(filter.getEndDate()) : null
-        );
-        return TransactionMapper.toCollectionResponse(transactionRepository.findAll(spec, pageable));
+        return transactionService.getTransactions(user, filter, pageable);
     }
 
     @PostMapping("/")
@@ -57,8 +46,7 @@ public class TransactionController {
             @AuthenticationPrincipal User user,
             @RequestBody(required = true) @Valid CreateTransactionRequest dto
     ) {
-        Transaction transaction = TransactionMapper.toEntity(user, dto);
-        return TransactionMapper.toResponse(transactionRepository.save(transaction));
+        return transactionService.createTransaction(user, dto);
     }
 
     @GetMapping("/{id}")
@@ -66,15 +54,13 @@ public class TransactionController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID id
     ) {
-        Transaction transaction = this.getUserTransactionOrThrow(user, id);
-        return TransactionMapper.toResponse(transaction);
+        return transactionService.getSingleTransaction(user, id);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteTransaction(@AuthenticationPrincipal User user, @PathVariable UUID id) {
-        Transaction transaction = this.getUserTransactionOrThrow(user, id);
-        transactionRepository.delete(transaction);
+        transactionService.deleteTransaction(user, id);
     }
 
     @PutMapping("/{id}")
@@ -83,8 +69,6 @@ public class TransactionController {
             @PathVariable UUID id,
             @RequestBody(required = true) @Valid EditTransactionRequest dto
     ) {
-        Transaction transaction = this.getUserTransactionOrThrow(user, id);
-        transaction.updateFromDto(dto);
-        return TransactionMapper.toResponse(transactionRepository.save(transaction));
+        return transactionService.updateTransaction(user, id, dto);
     }
 }
