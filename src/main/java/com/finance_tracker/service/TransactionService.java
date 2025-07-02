@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.UUID;
@@ -51,6 +52,7 @@ public class TransactionService {
         return TransactionMapper.toCollectionResponse(transactionRepository.findAll(spec, pageable));
     }
 
+    @Transactional
     public SingleTransactionResponse createTransaction(User user, @Valid CreateTransactionRequest dto) {
         try {
             Transaction transaction = TransactionMapper.toEntity(user, dto);
@@ -64,17 +66,19 @@ public class TransactionService {
         }
     }
 
+    @Transactional(readOnly = true)
     public SingleTransactionResponse getSingleTransaction(User user, UUID id) {
         Transaction transaction = getUserTransactionOrThrow(user, id);
         return TransactionMapper.toResponse(transaction);
     }
 
+    @Transactional
     public void deleteTransaction(User user, UUID id) {
         Transaction transaction = this.getUserTransactionOrThrow(user, id);
         transactionRepository.delete(transaction);
     }
 
-
+    @Transactional
     public SingleTransactionResponse updateTransaction(
             User user,
             UUID id,

@@ -14,6 +14,11 @@ import com.finance_tracker.mapper.TransactionMapper;
 import com.finance_tracker.repository.TransactionRepository;
 import com.finance_tracker.repository.TransactionSpecification;
 import com.finance_tracker.service.TransactionService;
+import io.swagger.v3.oas.annotations.OpenAPI31;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +29,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/transactions")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;

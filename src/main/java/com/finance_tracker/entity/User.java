@@ -3,6 +3,7 @@ package com.finance_tracker.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -30,4 +31,15 @@ public class User {
     @Setter
     @Column(name = "hashed_password", nullable = false)
     private String password;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Setter
+    private Date joinedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (joinedAt == null) {
+            joinedAt = new Date();
+        }
+    }
 }
