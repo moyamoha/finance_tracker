@@ -68,5 +68,6 @@ public class Transaction {
         if (dto.getDate() != null) { this.setDate(dto.getDate()); }
         if (dto.getAmount() != null) { this.setAmount(dto.getAmount()); }
         if (dto.getType() != null) { this.setType(dto.getType()); }
+        if (dto.getDescription() != null) { this.setDescription(dto.getDescription()); }
     }
 }

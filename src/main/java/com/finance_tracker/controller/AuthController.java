@@ -20,11 +20,14 @@ import org.slf4j.Logger;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationService authService;
-    @Autowired
-    private UserRepository userRepository;
+    private final AuthenticationService authService;
+    private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    public AuthController(AuthenticationService authService, UserRepository userRepository) {
+        this.authService = authService;
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("/login")
     public String login(@RequestBody @Valid LoginRequest dto) {

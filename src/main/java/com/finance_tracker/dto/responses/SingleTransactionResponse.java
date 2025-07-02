@@ -15,6 +15,7 @@ public class SingleTransactionResponse {
     private UUID userId;
     private TransactionType type;
     private TransactionCategory category;
+    private String description;
     private BigDecimal amount;
     private Date date;
     private Date createdAt;

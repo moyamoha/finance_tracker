@@ -20,6 +20,8 @@ public class CreateTransactionRequest {
     @NotNull
     private TransactionCategory category;
 
+    private String description;
+
     @PositiveOrZero
     private BigDecimal amount;
 

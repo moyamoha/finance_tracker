@@ -15,6 +15,7 @@ public class EditTransactionRequest {
     private TransactionType type;
 
     private TransactionCategory category;
+    private String description;
 
     @PositiveOrZero
     private BigDecimal amount;

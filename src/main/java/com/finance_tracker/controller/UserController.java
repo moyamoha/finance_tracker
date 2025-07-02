@@ -16,20 +16,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     @GetMapping("/me")
     public ProfileResponse fetchProfile(@AuthenticationPrincipal User user) {
-        logger.info(user.getId().toString());
         return new ProfileResponse(
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName()
         );
     }
-
 }

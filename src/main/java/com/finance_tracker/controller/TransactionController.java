@@ -13,9 +13,6 @@ import com.finance_tracker.mapper.TransactionMapper;
 import com.finance_tracker.repository.TransactionRepository;
 import com.finance_tracker.repository.TransactionSpecification;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -27,10 +24,16 @@ import java.util.UUID;
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+    public TransactionController(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
+
+    private Transaction getUserTransactionOrThrow(User user, UUID id) {
+        return transactionRepository.getTransactionsByUserAndId(user, id)
+                .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
+    }
 
     @GetMapping("/")
     public TransactionCollectionResponse getTransactions(
@@ -63,16 +66,14 @@ public class TransactionController {
             @AuthenticationPrincipal User user,
             @PathVariable UUID id
     ) {
-        Transaction transaction = transactionRepository.getTransactionsByUserAndId(user, id)
-                .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
+        Transaction transaction = this.getUserTransactionOrThrow(user, id);
         return TransactionMapper.toResponse(transaction);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteTransaction(@AuthenticationPrincipal User user, @PathVariable UUID id) {
-        Transaction transaction = transactionRepository.getTransactionsByUserAndId(user, id)
-                .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
+        Transaction transaction = this.getUserTransactionOrThrow(user, id);
         transactionRepository.delete(transaction);
     }
 
@@ -82,8 +83,7 @@ public class TransactionController {
             @PathVariable UUID id,
             @RequestBody(required = true) @Valid EditTransactionRequest dto
     ) {
-        Transaction transaction = transactionRepository.getTransactionsByUserAndId(user, id)
-                .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
+        Transaction transaction = this.getUserTransactionOrThrow(user, id);
         transaction.updateFromDto(dto);
         return TransactionMapper.toResponse(transactionRepository.save(transaction));
     }
