@@ -2,12 +2,20 @@ package com.finance_tracker.service;
 
 import com.finance_tracker._shared.Identifier;
 import com.finance_tracker.dto.filter.TransactionFilterRequest;
-import com.finance_tracker.dto.requests.CreateTransactionRequest;
-import com.finance_tracker.dto.requests.EditTransactionRequest;
-import com.finance_tracker.dto.responses.SingleTransactionResponse;
-import com.finance_tracker.dto.responses.TransactionCollectionResponse;
+import com.finance_tracker.dto.requests.transaction.CreateTransactionRequest;
+import com.finance_tracker.dto.requests.transaction.EditTransactionRequest;
+import com.finance_tracker.dto.responses.transaction.SingleTransactionResponse;
+import com.finance_tracker.dto.responses.transaction.TransactionCollectionResponse;
+import com.finance_tracker.entity.Account;
 import com.finance_tracker.entity.Transaction;
 import com.finance_tracker.entity.User;
+import com.finance_tracker.enums.TransactionCategory;
+import com.finance_tracker.enums.TransactionType;
+import com.finance_tracker.events.events.transaction.TransactionCreatedEvent;
+import com.finance_tracker.events.events.transaction.TransactionDeletedEvent;
+import com.finance_tracker.events.events.transaction.TransactionUpdatedEvent;
+import com.finance_tracker.events.payload.TransactionUpdateInfo;
+import com.finance_tracker.exception.http.BadRequestException;
 import com.finance_tracker.exception.http.HttpException;
 import com.finance_tracker.exception.http.ItemNotFoundException;
 import com.finance_tracker.mapper.TransactionMapper;
@@ -15,6 +23,7 @@ import com.finance_tracker.repository.TransactionRepository;
 import com.finance_tracker.repository.TransactionSpecification;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -30,12 +39,18 @@ public class TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private Transaction getUserTransactionOrThrow(User user, UUID id) {
         return transactionRepository.getTransactionsByUserAndId(user, id)
                 .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(Transaction.class, new Identifier<>(id)));
     }
 
+    @Transactional
     public TransactionCollectionResponse getTransactions(
             @AuthenticationPrincipal User user,
             @ModelAttribute TransactionFilterRequest filter,
@@ -54,16 +69,13 @@ public class TransactionService {
 
     @Transactional
     public SingleTransactionResponse createTransaction(User user, @Valid CreateTransactionRequest dto) {
-        try {
-            Transaction transaction = TransactionMapper.toEntity(user, dto);
-            return TransactionMapper.toResponse(transactionRepository.save(transaction));
-        } catch (Exception e) {
-            throw new HttpException(
-                    HttpStatus.BAD_REQUEST,
-                    "Bad Request",
-                    e.getMessage()
-            );
-        }
+        Account account = accountService.getAccountForUserByIdOrThrow(user, dto.getAccountId());
+        Transaction transaction = TransactionMapper.toEntity(user, dto);
+        transaction.setAccount(account);
+        validateTypeAndCategoryMatches(transaction);
+        SingleTransactionResponse response = TransactionMapper.toResponse(transactionRepository.save(transaction));
+        eventPublisher.publishEvent(new TransactionCreatedEvent(transaction));
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +88,7 @@ public class TransactionService {
     public void deleteTransaction(User user, UUID id) {
         Transaction transaction = this.getUserTransactionOrThrow(user, id);
         transactionRepository.delete(transaction);
+        eventPublisher.publishEvent(new TransactionDeletedEvent(transaction));
     }
 
     @Transactional
@@ -85,15 +98,22 @@ public class TransactionService {
             @Valid EditTransactionRequest dto
     ) {
         Transaction transaction = this.getUserTransactionOrThrow(user, id);
-        try {
-            transaction.updateFromDto(dto);
-            return TransactionMapper.toResponse(transaction);
-        } catch (Exception e) {
-            throw new HttpException(
-                    HttpStatus.BAD_REQUEST,
-                    "Bad request",
-                    e.getMessage()
-            );
-        }
+        TransactionUpdateInfo oldInfo = new TransactionUpdateInfo(transaction.getAmount(), transaction.getType());
+        transaction.updateFromDto(dto);
+
+        validateTypeAndCategoryMatches(transaction);
+        eventPublisher.publishEvent(
+                new TransactionUpdatedEvent(transaction, oldInfo)
+        );
+        return TransactionMapper.toResponse(transaction);
+
+    }
+
+    private void validateTypeAndCategoryMatches(Transaction transaction) {
+        TransactionType type = transaction.getType();
+        TransactionCategory category = transaction.getCategory();
+        if (!category.getTransactionType().equals(type)) {
+            throw new BadRequestException(String.format("%s cannot be of type %s",category.name(), type.name()));
+        };
     }
 }

@@ -1,4 +1,4 @@
-package com.finance_tracker.dto.responses;
+package com.finance_tracker.dto.responses.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

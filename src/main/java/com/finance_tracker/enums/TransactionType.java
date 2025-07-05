@@ -3,8 +3,8 @@ package com.finance_tracker.enums;
 import lombok.Getter;
 
 public enum TransactionType {
-    INCOME("income"),
-    EXPENSE("expense");
+    INCOME("Income"),
+    EXPENSE("Expense");
 
     @Getter
     private final String displayName;

@@ -1,6 +1,7 @@
 package com.finance_tracker.authentication;
 
 import com.finance_tracker.dto.requests.LoginRequest;
+import com.finance_tracker.dto.responses.authentication.SuccessfulLoginTokenResponse;
 import com.finance_tracker.exception.authentication.PasswordNotMatchedException;
 import com.finance_tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class AuthenticationService {
     @Autowired
     private UserRepository userRepository;
 
-    public String login (LoginRequest dto) {
+    public SuccessfulLoginTokenResponse login (LoginRequest dto) {
         UserDetails details = this.userDetailsService.loadUserByUsername(dto.getEmail());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -27,6 +28,7 @@ public class AuthenticationService {
             throw new PasswordNotMatchedException("Password is invalid/wrong");
         }
 
-        return jwtService.generateToken(details.getUsername());
+        String token = jwtService.generateToken(details.getUsername());
+        return new SuccessfulLoginTokenResponse(token);
     }
 }

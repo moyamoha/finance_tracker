@@ -3,6 +3,7 @@ package com.finance_tracker.controller;
 import com.finance_tracker.authentication.AuthenticationService;
 import com.finance_tracker.dto.requests.LoginRequest;
 import com.finance_tracker.dto.requests.CreateUserRequest;
+import com.finance_tracker.dto.responses.authentication.SuccessfulLoginTokenResponse;
 import com.finance_tracker.repository.UserRepository;
 import com.finance_tracker.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid LoginRequest dto) {
+    public SuccessfulLoginTokenResponse login(@RequestBody @Valid LoginRequest dto) {
         return authService.login(dto);
     }
 

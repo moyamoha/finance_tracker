@@ -1,14 +1,11 @@
 package com.finance_tracker.mapper;
 
-import com.finance_tracker.dto.requests.CreateTransactionRequest;
-import com.finance_tracker.dto.responses.SingleTransactionResponse;
-import com.finance_tracker.dto.responses.TransactionCollectionResponse;
+import com.finance_tracker.dto.requests.transaction.CreateTransactionRequest;
+import com.finance_tracker.dto.responses.transaction.SingleTransactionResponse;
+import com.finance_tracker.dto.responses.transaction.TransactionCollectionResponse;
 import com.finance_tracker.entity.Transaction;
 import com.finance_tracker.entity.User;
 import org.springframework.data.domain.Page;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionMapper {
@@ -34,6 +31,7 @@ public class TransactionMapper {
         response.setDescription(transaction.getDescription());
         response.setDate(transaction.getDate());
         response.setCreatedAt(transaction.getCreatedAt());
+        response.setAccountId(transaction.getAccount().getId());
         return response;
     }
 

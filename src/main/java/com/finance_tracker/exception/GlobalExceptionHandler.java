@@ -1,5 +1,6 @@
 package com.finance_tracker.exception;
 
+import com.finance_tracker.exception.custom.CustomApplicationException;
 import com.finance_tracker.exception.http.HttpException;
 import com.finance_tracker.exception.http.RequestUnprocessable;
 import org.slf4j.Logger;
@@ -39,6 +40,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleNotFoundException(MethodArgumentTypeMismatchException ex) {
         HttpException exception = new HttpException(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
+        return ResponseEntity.status(exception.getStatusCode()).body(exception.getUserReadablePayload());
+    }
+
+    @ExceptionHandler(CustomApplicationException.class)
+    public ResponseEntity<Object> handleCustomException(CustomApplicationException ex) {
+        HttpException exception = new HttpException(HttpStatus.UNPROCESSABLE_ENTITY, "Content is unprocessable", ex.getMessage());
         return ResponseEntity.status(exception.getStatusCode()).body(exception.getUserReadablePayload());
     }
 

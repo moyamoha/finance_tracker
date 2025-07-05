@@ -1,5 +1,6 @@
 package com.finance_tracker.dto.filter;
 
+import com.finance_tracker.enums.TransactionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
