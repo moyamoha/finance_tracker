@@ -9,9 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -53,18 +55,19 @@ public class Transaction {
     @Setter
     private String description;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Setter
-    private Date date;
+    private LocalDateTime date;
 
     @CreatedDate
-    private Date createdAt;
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public void updateFromDto(EditTransactionRequest dto) {
         if (dto.getCategory() != null) { this.setCategory(dto.getCategory()); }
         if (dto.getDate() != null) { this.setDate(dto.getDate()); }
         if (dto.getAmount() != null) { this.setAmount(dto.getAmount()); }
-        if (dto.getType() != null) { this.setType(dto.getType()); }
         if (dto.getDescription() != null) { this.setDescription(dto.getDescription()); }
     }
 }

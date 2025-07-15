@@ -7,12 +7,13 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class EditTransactionRequest {
-    private TransactionType type;
-
+    private UUID accountId;
     private TransactionCategory category;
     private String description;
 
@@ -20,5 +21,5 @@ public class EditTransactionRequest {
     private BigDecimal amount;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date date;
+    private LocalDateTime date;
 }

@@ -16,6 +16,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "user_id", "name" })
+})
 public class Account {
 
     @Id
@@ -54,6 +57,7 @@ public class Account {
         this.user = user;
         this.createdAt = new Date();
         this.initialBalance = initialBalance;
+        this.balance = initialBalance;
     }
 
     public void incrementBalance(BigDecimal amount) {

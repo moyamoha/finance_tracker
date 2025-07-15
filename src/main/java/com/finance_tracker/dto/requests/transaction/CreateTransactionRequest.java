@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,9 +17,6 @@ public class CreateTransactionRequest {
 
     @NotNull
     private UUID accountId;
-
-    @NotNull
-    private TransactionType type;
 
     @NotNull
     private TransactionCategory category;
@@ -31,5 +29,5 @@ public class CreateTransactionRequest {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private Date date;
+    private LocalDateTime date;
 }

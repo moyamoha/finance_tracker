@@ -10,4 +10,5 @@ public class ProfileResponse {
     private String email;
     private String firstName;
     private String lastName;
+    private Boolean multiFactorAuthEnabled;
 }

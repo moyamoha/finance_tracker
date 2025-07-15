@@ -1,17 +1,18 @@
 package com.finance_tracker.controller;
 
 import com.finance_tracker.authentication.AuthenticationService;
-import com.finance_tracker.dto.requests.LoginRequest;
-import com.finance_tracker.dto.requests.CreateUserRequest;
+import com.finance_tracker.dto.requests.authentication.ConfirmEmailRequest;
+import com.finance_tracker.dto.requests.authentication.LoginRequest;
+import com.finance_tracker.dto.requests.authentication.CreateUserRequest;
+import com.finance_tracker.dto.requests.authentication.MultiFactorAuthenticationRequest;
 import com.finance_tracker.dto.responses.authentication.SuccessfulLoginTokenResponse;
 import com.finance_tracker.repository.UserRepository;
 import com.finance_tracker.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("/auth")
@@ -27,12 +28,23 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public SuccessfulLoginTokenResponse login(@RequestBody @Valid LoginRequest dto) {
+    public Object login(@RequestBody @Valid LoginRequest dto) throws MessagingException {
         return authService.login(dto);
     }
 
     @PostMapping("/signup")
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
     public void createUser(@Valid @RequestBody(required = true) CreateUserRequest dto) {
         userService.createUser(dto);
+    }
+
+    @PostMapping("/confirm-email")
+    public void completeRegistration(@Valid @RequestBody ConfirmEmailRequest dto) {
+        authService.confirmEmail(dto);
+    }
+
+    @PostMapping("/verify-otp")
+    public SuccessfulLoginTokenResponse verifyOtp(@Valid @RequestBody(required = true) MultiFactorAuthenticationRequest dto) {
+        return authService.verifyOtp(dto);
     }
 }

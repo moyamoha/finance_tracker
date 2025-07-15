@@ -37,10 +37,8 @@ public class JwtService {
     public String extractEmail(String token) {
         try {
             return this.parseClaims(token).getSubject();
-        } catch (IllegalArgumentException e) {
-            throw new InvalidOrExpiredToken(e.getMessage());
-        } catch (JwtException e) {
-            throw new InvalidOrExpiredToken("Invalid or expired tokens");
+        } catch (IllegalArgumentException | JwtException e) {
+            throw new InvalidOrExpiredToken();
         }
     }
 

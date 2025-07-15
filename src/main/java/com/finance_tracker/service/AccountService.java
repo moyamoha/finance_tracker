@@ -7,18 +7,18 @@ import com.finance_tracker.dto.requests.account.EditAccountRequest;
 import com.finance_tracker.dto.responses.account.AccountCollectionResponse;
 import com.finance_tracker.dto.responses.account.SingleAccountResponse;
 import com.finance_tracker.entity.Account;
+import com.finance_tracker.entity.Transaction;
 import com.finance_tracker.entity.User;
-import com.finance_tracker.events.events.account.AccountDeletedEvent;
-import com.finance_tracker.exception.http.HttpException;
+import com.finance_tracker.events.account.events.AccountDeletedEvent;
+import com.finance_tracker.exception.custom.account.AccountWithTheSameNameAlreadyExists;
 import com.finance_tracker.exception.http.ItemNotFoundException;
 import com.finance_tracker.mapper.AccountMapper;
-import com.finance_tracker.repository.AccountRepository;
-import com.finance_tracker.repository.AccountSpecification;
+import com.finance_tracker.repository.account.AccountRepository;
+import com.finance_tracker.repository.account.AccountSpecification;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,17 +35,12 @@ public class AccountService {
 
     @Transactional
     public SingleAccountResponse createAccount(User user, CreateAccountRequest dto) {
-        try {
-            Account account = AccountMapper.toEntity(user, dto);
-            accountRepository.save(account);
-            return AccountMapper.toSingleResponse(account);
-        } catch (Exception e) {
-            throw new HttpException(
-                    HttpStatus.BAD_REQUEST,
-                    "Bad request",
-                    e.getMessage()
-            );
+        if (accountAlreadyExistsByName(user, dto.getName())) {
+            throw new AccountWithTheSameNameAlreadyExists();
         }
+        Account account = AccountMapper.toEntity(user, dto);
+        accountRepository.save(account);
+        return AccountMapper.toSingleResponse(account);
     }
 
     @Transactional(readOnly = true)
@@ -68,22 +63,8 @@ public class AccountService {
             @Valid EditAccountRequest dto
     ) {
         Account account = this.getAccountForUserByIdOrThrow(user, id);
-        try {
-            account.updateFromDto(dto);
-            return AccountMapper.toSingleResponse(account);
-        } catch (Exception e) {
-            throw new HttpException(
-                    HttpStatus.BAD_REQUEST,
-                    "Bad request",
-                    e.getMessage()
-            );
-        }
-    }
-
-    public Account getAccountForUserByIdOrThrow(User user, UUID id) {
-        return accountRepository.findByUserAndId(user, id).orElseThrow(
-                () -> ItemNotFoundException.withIdentifierAndEntity(Account.class, new Identifier<>(id))
-        );
+        account.updateFromDto(dto);
+        return AccountMapper.toSingleResponse(account);
     }
 
     @Transactional
@@ -95,4 +76,19 @@ public class AccountService {
                 );
         return AccountMapper.toCollectionResponse(accountRepository.findAll(specs));
     }
+
+    public Boolean accountAlreadyExistsByName(User user, String name) {
+        return accountRepository.existsByUserAndName(user, name);
+    }
+
+    public Account getAccountForUserByIdOrThrow(User user, UUID id) {
+        return accountRepository.findByUserAndId(user, id).orElseThrow(
+                () -> ItemNotFoundException.withIdentifierAndEntity(Account.class, new Identifier<>(id))
+        );
+    }
+
+    public void adjustBalanceForNewTransaction(Account account, Transaction transaction) {
+
+    };
+
 }

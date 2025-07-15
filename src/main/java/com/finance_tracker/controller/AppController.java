@@ -4,6 +4,7 @@ import com.finance_tracker.dto.responses.account.AccountTypeResponse;
 import com.finance_tracker.dto.responses.transaction.SingleCategoryResponse;
 import com.finance_tracker.enums.AccountType;
 import com.finance_tracker.enums.TransactionCategory;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/app")
+@Tag(name = "App")
 public class AppController {
 
     @GetMapping("/categories")

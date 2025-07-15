@@ -1,5 +1,6 @@
 package com.finance_tracker.controller;
 
+import com.finance_tracker.authentication.CustomUserDetails;
 import com.finance_tracker.dto.filter.AccountFilterRequest;
 import com.finance_tracker.dto.requests.account.CreateAccountRequest;
 import com.finance_tracker.dto.requests.account.EditAccountRequest;
@@ -27,42 +28,43 @@ public class AccountController {
 
     @PostMapping("/")
     public SingleAccountResponse createAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CreateAccountRequest dto
-            ) {
+    ) {
+        User user = userDetails.getUser();
         return accountService.createAccount(user, dto);
     }
 
     @GetMapping("/")
     public AccountCollectionResponse getAccountsForUser(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @ModelAttribute AccountFilterRequest filter
-            ) {
-        return accountService.fetchAccountsOfUser(user, filter);
+    ) {
+        return accountService.fetchAccountsOfUser(userDetails.getUser(), filter);
     }
 
     @GetMapping("/{id}")
     public SingleAccountResponse getAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id
     ) {
-        return accountService.getAccount(user, id);
+        return accountService.getAccount(userDetails.getUser(), id);
     }
 
     @PutMapping("/{id}")
     public SingleAccountResponse updateAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id,
             @RequestBody @Valid EditAccountRequest dto
     ) {
-        return accountService.updateAccount(user, id, dto);
+        return accountService.updateAccount(userDetails.getUser(), id, dto);
     }
 
     @DeleteMapping("/{id}")
     public void deleteAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id
     ) {
-        this.accountService.deleteAccount(user, id);
+        this.accountService.deleteAccount(userDetails.getUser(), id);
     }
 }
