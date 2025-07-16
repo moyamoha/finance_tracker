@@ -2,7 +2,7 @@ package com.finance_tracker.schedules;
 
 import com.finance_tracker.entity.User;
 import com.finance_tracker.events.user.events.UserMarkedForDeletionEvent;
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;

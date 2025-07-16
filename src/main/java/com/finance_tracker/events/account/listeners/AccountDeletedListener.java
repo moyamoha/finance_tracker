@@ -7,7 +7,7 @@ import com.finance_tracker.entity.User;
 import com.finance_tracker.events.account.events.AccountDeletedEvent;
 import com.finance_tracker.repository.account.AccountRepository;
 import com.finance_tracker.repository.transaction.TransactionRepository;
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

@@ -6,7 +6,7 @@ import com.finance_tracker.entity.Account;
 import com.finance_tracker.entity.User;
 import com.finance_tracker.enums.AccountType;
 import com.finance_tracker.repository.account.AccountRepository;
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +21,7 @@ public class SystemInitializer implements CommandLineRunner {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+
     @Override
     public void run(String... args) throws Exception {
         User anonymousUser = (User) userRepository.findByEmail(SystemConstants.ANONYMOUS_USER_EMAIL)

@@ -31,7 +31,7 @@ public class AccountMapper {
 
     public static AccountCollectionResponse toCollectionResponse(List<Account> accountsList) {
         List<SingleAccountResponse> content = accountsList.stream().map(AccountMapper::toSingleResponse).toList();
-        Long totalElements = accountsList.stream().count();
+        Long totalElements = (long) accountsList.size();
         return new AccountCollectionResponse(content, totalElements);
     }
 }

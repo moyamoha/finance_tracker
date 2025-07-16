@@ -6,7 +6,7 @@ import com.finance_tracker.dto.requests.authentication.LoginRequest;
 import com.finance_tracker.dto.requests.authentication.CreateUserRequest;
 import com.finance_tracker.dto.requests.authentication.MultiFactorAuthenticationRequest;
 import com.finance_tracker.dto.responses.authentication.SuccessfulLoginTokenResponse;
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;

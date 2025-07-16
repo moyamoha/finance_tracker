@@ -15,12 +15,10 @@ import com.finance_tracker.exception.authentication.InvalidEmailOrPasswordExcept
 import com.finance_tracker.exception.authentication.InvalidOrExpiredToken;
 import com.finance_tracker.exception.authentication.OtpCodeIncorrectOrExpiredException;
 import com.finance_tracker.exception.authentication.UserNotFoundException;
-import com.finance_tracker.exception.http.BadRequestException;
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.repository.temporary_token.TemporaryTokenRepository;
 import com.finance_tracker.service.EmailOtpService;
 import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,11 +28,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -63,7 +59,6 @@ public class AuthenticationService {
             }
         }
 
-
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String authenticatedEmail = userDetails.getUsername(); // This gives you the email/username
 
@@ -83,7 +78,6 @@ public class AuthenticationService {
             );
         } else {
             if (user.getMarkedInactiveAt() != null) {
-                // Activate inactive user
                 user.setMarkedInactiveAt(null);
                 userRepository.save(user);
                 eventPublisher.publishEvent(new ReactivateMarkedUserEvent(user));

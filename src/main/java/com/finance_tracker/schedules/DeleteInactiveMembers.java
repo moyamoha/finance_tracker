@@ -2,11 +2,7 @@ package com.finance_tracker.schedules;
 
 import com.finance_tracker.entity.User;
 import com.finance_tracker.events.user.events.UserDeletedEvent;
-import com.finance_tracker.repository.UserRepository;
-import com.finance_tracker.repository.account.AccountRepository;
-import com.finance_tracker.repository.budget.BudgetRepository;
-import com.finance_tracker.repository.temporary_token.TemporaryTokenRepository;
-import com.finance_tracker.repository.transaction.TransactionRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.service.RetentionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

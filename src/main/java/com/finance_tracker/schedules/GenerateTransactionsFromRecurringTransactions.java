@@ -1,12 +1,8 @@
 package com.finance_tracker.schedules;
 
-import com.finance_tracker.dto.requests.transaction.CreateTransactionRequest;
 import com.finance_tracker.entity.RecurringTransaction;
-import com.finance_tracker.entity.User;
 import com.finance_tracker.helpers.RecurringTransactionHelper;
-import com.finance_tracker.repository.UserRepository;
 import com.finance_tracker.repository.recurring_transaction.RecurringTransactionRepository;
-import com.finance_tracker.repository.transaction.TransactionRepository;
 import com.finance_tracker.service.RecurringTransactionService;
 import com.finance_tracker.service.TransactionService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.finance_tracker.schedules;
 
-import com.finance_tracker.repository.UserRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.repository.temporary_token.TemporaryTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
