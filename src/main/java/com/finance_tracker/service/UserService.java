@@ -4,7 +4,6 @@ import com.finance_tracker.dto.requests.authentication.CreateUserRequest;
 import com.finance_tracker.dto.requests.user.ChangeMfaSettingsRequest;
 import com.finance_tracker.dto.requests.user.ChangeUserPreferencesRequest;
 import com.finance_tracker.entity.User;
-import com.finance_tracker.entity.UserProfile;
 import com.finance_tracker.events.user.events.UserCreatedEvent;
 import com.finance_tracker.events.user.events.UserMarkedForDeletionEvent;
 import com.finance_tracker.exception.custom.user.MfaAlreadyDisabledException;
@@ -12,7 +11,6 @@ import com.finance_tracker.exception.custom.user.MfaAlreadyEnabledException;
 import com.finance_tracker.exception.custom.user.IncorrectPasswordForActionException;
 import com.finance_tracker.exception.custom.user.UserAlreadyRegisteredException;
 import com.finance_tracker.mapper.UserMapper;
-import com.finance_tracker.repository.user.UserProfileRepository;
 import com.finance_tracker.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,7 +25,6 @@ public class UserService {
 
 
     private UserRepository userRepository;
-    private UserProfileRepository userProfileRepository;
     private BCryptPasswordEncoder encoder;
     private ApplicationEventPublisher eventPublisher;
 
@@ -36,14 +33,7 @@ public class UserService {
         String hashedPassword = encoder.encode(dto.getPassword());
         dto.setPassword(hashedPassword);
         User newUser = UserMapper.toEntity(dto);
-
-        UserProfile userProfile = new UserProfile();
-        if (dto.getTimezone() != null) userProfile.setTimezone(dto.getTimezone());
-        if (dto.getCurrency() != null) userProfile.setCurrency(dto.getCurrency());
-
         userRepository.save(newUser);
-        userProfile.setUser(newUser);
-        userProfileRepository.save(userProfile);
         eventPublisher.publishEvent(new UserCreatedEvent(newUser));
         return newUser;
     }
@@ -67,11 +57,11 @@ public class UserService {
         eventPublisher.publishEvent(new UserMarkedForDeletionEvent(user));
     }
 
-    public UserProfile changeUserPreferences(UserProfile userProfile, ChangeUserPreferencesRequest dto) {
-        if (dto.getTimezone() != null) userProfile.setTimezone(dto.getTimezone());
-        if (dto.getCurrency() != null) userProfile.setCurrency(dto.getCurrency());
+    public User changeUserPreferences(User user, ChangeUserPreferencesRequest dto) {
+        if (dto.getTimezone() != null) user.setTimezone(dto.getTimezone());
+        if (dto.getCurrency() != null) user.setCurrency(dto.getCurrency());
 
-        return userProfileRepository.save(userProfile);
+        return userRepository.save(user);
     }
 
     private void throwIfAlreadyRegistered(String email) {

@@ -6,6 +6,7 @@ import com.finance_tracker.dto.responses.CollectionResponse;
 import com.finance_tracker.dto.responses.recurring_transaction.RecurringTransactionCollectionResponse;
 import com.finance_tracker.dto.responses.recurring_transaction.RecurringTransactionResponse;
 import com.finance_tracker.entity.RecurringTransaction;
+import com.finance_tracker.entity.User;
 import com.finance_tracker.helpers.RecurringTransactionHelper;
 
 import java.time.LocalDate;
@@ -13,8 +14,9 @@ import java.util.List;
 
 public class RecurringTransactionMapper {
 
-    public static RecurringTransaction toEntity(CreateRecurringTransactionRequest dto) {
+    public static RecurringTransaction toEntity(User user, CreateRecurringTransactionRequest dto) {
         return RecurringTransaction.builder()
+                .user(user)
                 .amount(dto.getAmount())
                 .category(dto.getCategory())
                 .frequency(dto.getFrequency())
@@ -22,6 +24,7 @@ public class RecurringTransactionMapper {
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .description(dto.getDescription())
+                .lastGeneratedDate(null)
                 .build();
     }
 

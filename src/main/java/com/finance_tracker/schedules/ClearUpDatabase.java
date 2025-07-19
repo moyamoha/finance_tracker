@@ -21,10 +21,12 @@ public class ClearUpDatabase {
     private Integer emailVerificationTokenExpirationHours;
 
 
+    // EVERY DAY AT 3
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void cleanUpDatabase() {
         deleteUsersWhoHaveNotConfirmedTheirEmail();
+        deleteExpiredTokens();
     }
 
     private void deleteUsersWhoHaveNotConfirmedTheirEmail() {

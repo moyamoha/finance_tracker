@@ -1,5 +1,6 @@
 package com.finance_tracker.dto.responses.budget;
 
+import com.finance_tracker.enums.BudgetPeriod;
 import com.finance_tracker.enums.TransactionCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class BudgetResponse {
     private UUID userId;
     private UUID accountId;
     private TransactionCategory category;
+    private BudgetPeriod period;
     private String name;
     private BigDecimal amount;
     private BigDecimal remaining;

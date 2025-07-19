@@ -20,7 +20,7 @@ public class GenerateTransactionsFromRecurringTransactions {
     private final RecurringTransactionRepository recurringTransactionRepository;
     private final RecurringTransactionService recurringTransactionService;
 
-    @Scheduled(cron = "0 30 1 * * *")
+    @Scheduled(cron = "0 0 4 * * *")
     public void handle() {
         LocalDate today = LocalDate.now();
         List<RecurringTransaction> eligible = recurringTransactionService.getByNextGenerationDate(today);

@@ -1,7 +1,7 @@
 package com.finance_tracker.entity;
 
 import com.finance_tracker._shared.LocalDateRange;
-import com.finance_tracker._shared.LocalDateTimeRange;
+import com.finance_tracker.enums.BudgetPeriod;
 import com.finance_tracker.enums.TransactionCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,7 +56,12 @@ public class Budget {
 
     private LocalDate endDate;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BudgetPeriod period;
+
     private Boolean isActive = true;
+    private Boolean alertSent = false;
 
     @CreatedDate
     private LocalDateTime createdAt;

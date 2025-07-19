@@ -9,6 +9,7 @@ import com.finance_tracker.dto.requests.budget.EditBudgetRequest;
 import com.finance_tracker.dto.responses.CollectionResponse;
 import com.finance_tracker.dto.responses.budget.BudgetResponse;
 import com.finance_tracker.entity.*;
+import com.finance_tracker.enums.BudgetPeriod;
 import com.finance_tracker.enums.TransactionType;
 import com.finance_tracker.events.budget.events.BudgetUpdatedEvent;
 import com.finance_tracker.exception.custom.budget.DuplicateBudgetException;
@@ -20,6 +21,11 @@ import com.finance_tracker.helpers.BudgetHelper;
 import com.finance_tracker.mapper.BudgetMapper;
 import com.finance_tracker.repository.budget.BudgetRepository;
 import com.finance_tracker.repository.budget.BudgetSpecification;
+import com.finance_tracker.service.mailing.EmailPayload;
+import com.finance_tracker.service.mailing.MailService;
+import com.finance_tracker.service.validators.BudgetValidator;
+import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,21 +34,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final AccountService accountService;
     private final ApplicationEventPublisher eventPublisher;
-
-    public BudgetService(BudgetRepository budgetRepository, AccountService accountService, ApplicationEventPublisher eventPublisher) {
-        this.budgetRepository = budgetRepository;
-        this.accountService = accountService;
-        this.eventPublisher = eventPublisher;
-    }
+    private final BudgetValidator validator;
+    private final MailService mailService;
 
     @Transactional
     public BudgetResponse createBudget(User user, CreateBudgetRequest dto) {
@@ -57,11 +61,15 @@ public class BudgetService {
         )) {
             throw new DuplicateBudgetException();
         }
+
         Budget budget = BudgetMapper.toEntity(user, dto);
         budget.setAccount(account);
 
-        BudgetHelper.validateBudgetCategoryOrThrow(budget);
-        BudgetHelper.validateBudgetDateRange(budget);
+        if (budget.getEndDate() != null && !budget.getPeriod().isFixedLength()) {
+            budget.setEndDate(null);
+        }
+
+        validator.validate(budget);
 
         budgetRepository.save(budget);
         return BudgetMapper.toSingleResponse(budget);
@@ -95,6 +103,7 @@ public class BudgetService {
         );
     }
 
+    @Transactional
     public BudgetResponse updateOne(User user, UUID id, EditBudgetRequest dto) {
         Budget budget = getBudgetByUserAndIdOrThrow(user, id);
         Budget original = BudgetMapper.cloneEntity(budget);
@@ -105,8 +114,7 @@ public class BudgetService {
             budget.setAccount(account);
         }
 
-        BudgetHelper.validateBudgetCategoryOrThrow(budget);
-        BudgetHelper.validateBudgetDateRange(budget);
+        validator.validate(budget);
 
         budgetRepository.save(budget);
         eventPublisher.publishEvent(new BudgetUpdatedEvent(budget, original));
@@ -115,5 +123,24 @@ public class BudgetService {
 
     public List<Budget> findForTransaction(Transaction transaction) {
         return budgetRepository.findForTransaction(transaction);
+    }
+
+    public void sendAlertEmail(Budget budget) throws MessagingException {
+        if (budget.getAlertSent() != null && budget.getAlertSent()) return;
+        HashMap<String, Object> variables = new HashMap<>();
+
+        variables.put("totalBudget", budget.getAmount());
+        variables.put("amountSpent", budget.getAmount().subtract(budget.getRemaining()));
+        variables.put("budgetName", budget.getName());
+        variables.put("budgetDetailsUrl", "https://yahyasalimi.com");
+        variables.put("budgetPercentage", "80%");
+
+        EmailPayload payload = new EmailPayload(
+                budget.getUser().getEmail(),
+                "[Alert] Budget reached 80%",
+                variables
+        );
+
+        mailService.sendHtmlEmailFromTemplate("budget-alert-email", payload);
     }
 }

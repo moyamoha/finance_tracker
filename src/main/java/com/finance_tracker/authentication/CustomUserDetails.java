@@ -1,9 +1,7 @@
 package com.finance_tracker.authentication;
 
 import com.finance_tracker._shared.SystemConstants;
-import com.finance_tracker.entity.UserProfile;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,17 +14,8 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private final User user;
 
-    @Getter
-    @Setter
-    private UserProfile userProfile;
-
     public CustomUserDetails(User entityUser) {
         this.user = entityUser;
-    }
-
-    public CustomUserDetails(User user, UserProfile userProfile) {
-        this.user = user;
-        this.userProfile = userProfile;
     }
 
     @Override

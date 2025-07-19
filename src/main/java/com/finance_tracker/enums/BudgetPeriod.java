@@ -4,15 +4,21 @@ import lombok.Getter;
 
 public enum BudgetPeriod {
     WEEKLY("Weekly"),
+    BIWEEKLY("Bi-weekly"),
     MONTHLY("Monthly"),
     QUARTERLY("Quarterly"),
-    YEARLY("Yearly");
+    YEARLY("Yearly"),
+    FIXED_LENGTH("Fixed length");
 
     @Getter
     private final String displayName;
 
     BudgetPeriod(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isFixedLength() {
+        return this.name().equals(BudgetPeriod.FIXED_LENGTH.name());
     }
 
 }

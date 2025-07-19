@@ -1,5 +1,6 @@
 package com.finance_tracker.dto.requests.budget;
 
+import com.finance_tracker.enums.BudgetPeriod;
 import com.finance_tracker.enums.TransactionCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +20,8 @@ public class EditBudgetRequest {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
+
+    private BudgetPeriod period;
 
     private UUID accountId;
 

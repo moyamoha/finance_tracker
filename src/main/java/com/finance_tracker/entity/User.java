@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,36 +19,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Setter
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Setter
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Setter
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Setter
     @Column(name = "hashed_password", nullable = false)
     private String password;
 
-    @Setter
     private LocalDateTime joinedAt;
-
-    @Setter
     private LocalDateTime lastLoggedIn;
-
-    @Setter
     private LocalDateTime markedInactiveAt;
-
-    @Setter
     private Boolean isMfaEnabled = false;
-
-    @Setter
     private Boolean emailConfirmed = false;
+    private String currency;
+    private String timezone;
 
     @PrePersist
     protected void onCreate() {

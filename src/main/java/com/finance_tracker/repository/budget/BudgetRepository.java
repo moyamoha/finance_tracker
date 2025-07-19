@@ -16,4 +16,6 @@ public interface BudgetRepository extends JpaRepository<Budget, UUID>, JpaSpecif
     Optional<Budget> findByUserAndId(User user, UUID id);
     Boolean existsByUserAndAccountAndCategory(User user, Account account, TransactionCategory category);
     void deleteByUser(User user);
+
+    List<Budget> findByIsActive(Boolean isActive);
 }

@@ -42,10 +42,4 @@ public class AccountHelper {
             account.incrementBalance(transaction.getAmount());
         }
     }
-
-    public static void validateSufficientFundsInAccount(Account account) {
-        if (account.getBalance().compareTo(BigDecimal.ZERO) < 0) {
-            throw InsufficientFundsException.withAccountId(account.getId());
-        }
-    }
 }

@@ -15,6 +15,7 @@ import com.finance_tracker.helpers.RecurringTransactionHelper;
 import com.finance_tracker.mapper.RecurringTransactionMapper;
 import com.finance_tracker.repository.account.AccountRepository;
 import com.finance_tracker.repository.recurring_transaction.RecurringTransactionRepository;
+import com.finance_tracker.service.validators.RecurringTransactionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,21 +29,20 @@ public class RecurringTransactionService {
 
     private final AccountRepository accountRepository;
     private final RecurringTransactionRepository recurringTransactionRepository;
+    private final RecurringTransactionValidator validator;
 
     public RecurringTransactionResponse createRecurringTransaction(
             User user,
             CreateRecurringTransactionRequest dto
     ) {
         Account account = getAccountOrThrow(user, dto.getAccountId());
-        RecurringTransaction recurringTransaction = RecurringTransactionMapper.toEntity(dto);
-        recurringTransaction.setUser(user);
+        RecurringTransaction recurringTransaction = RecurringTransactionMapper.toEntity(user, dto);
         recurringTransaction.setAccount(account);
-        recurringTransaction.setLastGeneratedDate(null);
 
         LocalDate next = RecurringTransactionHelper.calculateNextGenerationDate(recurringTransaction);
         recurringTransaction.setNextGenerationDate(next);
 
-        validateRecurringTransactionDateRange(recurringTransaction);
+        validator.validate(recurringTransaction);
 
         recurringTransactionRepository.save(recurringTransaction);
         return RecurringTransactionMapper.toSingleResponse(recurringTransaction);
@@ -62,7 +62,7 @@ public class RecurringTransactionService {
         RecurringTransaction rt = getRecurringTransactionOrThrow(user, id);
         RecurringTransactionMapper.updateFromDto(rt, dto);
 
-        validateRecurringTransactionDateRange(rt);
+        validator.validate(rt);
 
         recurringTransactionRepository.save(rt);
 
@@ -86,20 +86,5 @@ public class RecurringTransactionService {
     private RecurringTransaction getRecurringTransactionOrThrow(User user, UUID id) {
         return recurringTransactionRepository.findByUserAndId(user, id)
                 .orElseThrow(() -> ItemNotFoundException.withIdentifierAndEntity(RecurringTransaction.class, new Identifier<>(id)));
-    }
-
-    private void validateRecurringTransactionDateRange(RecurringTransaction rt) {
-        LocalDate start = rt.getStartDate();
-        LocalDate end = rt.getEndDate();
-
-        LocalDateRange range = new LocalDateRange(start, end);
-
-        if (range.endIsBeforeStart()) {
-            throw InvalidDateRangeException.withEndDateBeforeStartDate();
-        }
-
-        if (!range.includes(rt.getNextGenerationDate())) {
-            throw InvalidDateRangeException.withRangeTooShort();
-        }
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class RequestLoggingInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
+
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         logger.info(request.getRequestURI());

@@ -6,10 +6,11 @@ import lombok.Setter;
 
 @Setter @Getter
 @AllArgsConstructor
-public class WholeProfileResponse {
+public class ProfileResponse {
     private String email;
     private String firstName;
     private String lastName;
     private Boolean multiFactorAuthEnabled;
-    private UserProfileResponse preferences;
+    private String currency;
+    private String timezone;
 }

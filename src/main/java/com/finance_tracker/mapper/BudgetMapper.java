@@ -20,6 +20,7 @@ public class BudgetMapper {
         Budget budget = new Budget(user, dto.getAmount(), range);
         budget.setName(dto.getName());
         budget.setCategory(dto.getCategory());
+        budget.setPeriod(dto.getPeriod());
         budget.setUser(user);
         return budget;
     }
@@ -30,6 +31,7 @@ public class BudgetMapper {
                 budget.getUser().getId(),
                 budget.getAccount() != null ? budget.getAccount().getId() : null,
                 budget.getCategory(),
+                budget.getPeriod(),
                 budget.getName(),
                 budget.getAmount(),
                 budget.getRemaining(),

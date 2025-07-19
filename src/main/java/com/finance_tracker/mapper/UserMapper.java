@@ -11,6 +11,8 @@ public class UserMapper {
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .password(dto.getPassword())
+                .currency(dto.getCurrency() != null ? dto.getCurrency() : null)
+                .timezone(dto.getTimezone() != null ? dto.getTimezone() : null)
                 .build();
     }
 

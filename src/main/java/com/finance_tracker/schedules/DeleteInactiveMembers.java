@@ -25,7 +25,7 @@ public class DeleteInactiveMembers {
     @Value("${app.retention.notice-period-as-months}")
     private String noticePeriodAsMonths;
 
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     @Transactional
     public void deleteMarkedMembers() {
         try {

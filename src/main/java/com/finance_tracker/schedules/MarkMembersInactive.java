@@ -18,7 +18,7 @@ public class MarkMembersInactive {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 1 * * *")
     public void markUsersInactive() {
         try {
             LocalDateTime twoYearsAgo = LocalDateTime.now().minusYears(2);

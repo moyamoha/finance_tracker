@@ -8,6 +8,7 @@ import com.finance_tracker.exception.custom.account.InsufficientFundsException;
 import com.finance_tracker.helpers.AccountHelper;
 import com.finance_tracker.repository.account.AccountRepository;
 import com.finance_tracker.repository.budget.BudgetRepository;
+import com.finance_tracker.service.validators.AccountValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -22,6 +23,7 @@ public class TransactionCreatedListener {
 
     private final BudgetRepository budgetRepository;
     private final AccountRepository accountRepository;
+    private final AccountValidator accountValidator;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleTransactionCreated(TransactionCreatedEvent event) {
@@ -30,7 +32,7 @@ public class TransactionCreatedListener {
         Account account = transaction.getAccount();
 
         AccountHelper.adjustBalanceForNewTransaction(account, transaction);
-        AccountHelper.validateSufficientFundsInAccount(account);
+        accountValidator.validate(account);
 
         List<Budget> budgets = budgetRepository.findForTransaction(transaction);
         budgets.forEach(budget -> {

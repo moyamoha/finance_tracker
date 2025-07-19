@@ -20,7 +20,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({ AuditingEntityListener.class })
 public class RecurringTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

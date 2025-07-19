@@ -7,6 +7,7 @@ import com.finance_tracker.enums.TransactionType;
 import com.finance_tracker.events.transaction.events.TransactionDeletedEvent;
 import com.finance_tracker.helpers.AccountHelper;
 import com.finance_tracker.repository.budget.BudgetRepository;
+import com.finance_tracker.service.validators.AccountValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -19,6 +20,7 @@ import java.util.List;
 public class TransactionDeletedListener {
 
     private final BudgetRepository budgetRepository;
+    private final AccountValidator accountValidator;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleTransactionDeleted(TransactionDeletedEvent event) {
@@ -26,7 +28,7 @@ public class TransactionDeletedListener {
         Account account = transaction.getAccount();
 
         AccountHelper.adjustBalanceOnTransactionDeleted(account, transaction);
-        AccountHelper.validateSufficientFundsInAccount(account);
+        accountValidator.validate(account);
 
         List<Budget> budgets = budgetRepository.findForTransaction(transaction);
         budgets.forEach(budget -> {

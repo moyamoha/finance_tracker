@@ -7,6 +7,7 @@ import com.finance_tracker.enums.TransactionType;
 import com.finance_tracker.events.transaction.events.TransactionUpdatedEvent;
 import com.finance_tracker.helpers.AccountHelper;
 import com.finance_tracker.repository.budget.BudgetRepository;
+import com.finance_tracker.service.validators.AccountValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,6 +19,7 @@ import java.util.List;
 public class TransactionUpdatedListener {
 
     private final BudgetRepository budgetRepository;
+    private final AccountValidator accountValidator;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleTransactionUpdated(TransactionUpdatedEvent event) {
@@ -35,7 +37,7 @@ public class TransactionUpdatedListener {
         syncBudgetsForOldTransaction(original);
         syncBudgetsForNewTransaction(updated);
 
-        AccountHelper.validateSufficientFundsInAccount(account);
+        accountValidator.validate(account);
     }
 
     private void syncBudgetsForOldTransaction(Transaction transaction) {
