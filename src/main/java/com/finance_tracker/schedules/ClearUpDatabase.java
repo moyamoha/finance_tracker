@@ -1,5 +1,7 @@
 package com.finance_tracker.schedules;
 
+import com.finance_tracker.annotations.Auditable;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.repository.temporary_token.TemporaryTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class ClearUpDatabase {
     // EVERY DAY AT 3
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
+    @Auditable(actionType = "CLEAR_UP_DATABASE", resourceType = AuditResourceType.MULTIPLE)
     public void cleanUpDatabase() {
         deleteUsersWhoHaveNotConfirmedTheirEmail();
         deleteExpiredTokens();

@@ -9,7 +9,7 @@ import com.finance_tracker.events.user.events.UserMarkedForDeletionEvent;
 import com.finance_tracker.exception.custom.user.MfaAlreadyDisabledException;
 import com.finance_tracker.exception.custom.user.MfaAlreadyEnabledException;
 import com.finance_tracker.exception.custom.user.IncorrectPasswordForActionException;
-import com.finance_tracker.exception.custom.user.UserAlreadyRegisteredException;
+import com.finance_tracker.exception.custom.user.UserRegistrationException;
 import com.finance_tracker.mapper.UserMapper;
 import com.finance_tracker.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -40,13 +40,13 @@ public class UserService {
 
     public void changeMfaSetting(User user, ChangeMfaSettingsRequest dto) {
         checkIfPasswordMatchesOrElseThrow(user, dto.getPassword());
-        if (dto.getIsMfaEnabled() && user.getIsMfaEnabled()) {
+        if (dto.isMfaEnabled() && user.isMfaEnabled()) {
             throw new MfaAlreadyEnabledException(user.getEmail());
         }
-        if (!dto.getIsMfaEnabled() && !user.getIsMfaEnabled()) {
+        if (!dto.isMfaEnabled() && !user.isMfaEnabled()) {
             throw new MfaAlreadyDisabledException(user.getEmail());
         }
-        user.setIsMfaEnabled(dto.getIsMfaEnabled());
+        user.setMfaEnabled(dto.isMfaEnabled());
         userRepository.save(user);
     }
 
@@ -66,7 +66,7 @@ public class UserService {
 
     private void throwIfAlreadyRegistered(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new UserAlreadyRegisteredException(email);
+            throw new UserRegistrationException();
         }
     }
 

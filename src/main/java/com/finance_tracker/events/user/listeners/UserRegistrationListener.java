@@ -8,6 +8,7 @@ import com.finance_tracker.enums.TempTokenType;
 import com.finance_tracker.events.user.events.UserCreatedEvent;
 import com.finance_tracker.events.user.events.UserRegisteredSuccessfullyEvent;
 import com.finance_tracker.repository.temporary_token.TemporaryTokenRepository;
+import com.finance_tracker.repository.user.UserRepository;
 import com.finance_tracker.service.mailing.EmailPayload;
 import com.finance_tracker.service.mailing.MailService;
 import jakarta.mail.MessagingException;
@@ -25,6 +26,7 @@ public class UserRegistrationListener {
 
     private final MailService mailService;
     private final TemporaryTokenRepository tokenRepository;
+    private final UserRepository userRepository;
 
     @Value("${app.security.email-verification-token-expiration-hours}")
     private Integer emailVerificationTokenExpirationHours;
@@ -32,16 +34,21 @@ public class UserRegistrationListener {
     @Value("${app.security.email-verification-token-length}")
     private Integer emailVerificationTokenLength;
 
-    public UserRegistrationListener(MailService mailService, TemporaryTokenRepository tokenRepository) {
+    public UserRegistrationListener(MailService mailService, TemporaryTokenRepository tokenRepository, UserRepository userRepository) {
         this.mailService = mailService;
         this.tokenRepository = tokenRepository;
+        this.userRepository = userRepository;
     }
 
     @EventListener
     @Async
     public void handleUserSignedUp(UserCreatedEvent event) throws MessagingException {
         User user = event.user();
-        if (user.getEmail().equals(SystemConstants.ANONYMOUS_USER_EMAIL)) return;
+        if (user.getEmail().equals(SystemConstants.ANONYMOUS_USER_EMAIL)) {
+            user.setEmailConfirmed(true);
+            userRepository.save(user);
+            return;
+        }
 
         TemporaryToken token = new TemporaryToken();
         token.setTokenType(TempTokenType.EMAIL_VERIFICATION);

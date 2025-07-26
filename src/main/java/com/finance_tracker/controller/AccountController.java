@@ -1,5 +1,6 @@
 package com.finance_tracker.controller;
 
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.authentication.CustomUserDetails;
 import com.finance_tracker.dto.filter.AccountFilterRequest;
 import com.finance_tracker.dto.requests.account.CreateAccountRequest;
@@ -7,6 +8,7 @@ import com.finance_tracker.dto.requests.account.EditAccountRequest;
 import com.finance_tracker.dto.responses.account.AccountCollectionResponse;
 import com.finance_tracker.dto.responses.account.SingleAccountResponse;
 import com.finance_tracker.entity.User;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/accounts")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Accounts")
 public class AccountController {
@@ -27,6 +29,7 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping("/")
+    @Auditable(actionType = "CREATE_ACCOUNT", resourceType = AuditResourceType.ACCOUNT)
     public SingleAccountResponse createAccount(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CreateAccountRequest dto
@@ -52,6 +55,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
+    @Auditable(actionType = "UPDATE_ACCOUNT", resourceType = AuditResourceType.ACCOUNT)
     public SingleAccountResponse updateAccount(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id,
@@ -61,6 +65,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
+    @Auditable(actionType = "DELETE_ACCOUNT", resourceType = AuditResourceType.ACCOUNT)
     public void deleteAccount(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id

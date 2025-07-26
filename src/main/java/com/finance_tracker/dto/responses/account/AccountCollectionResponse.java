@@ -10,5 +10,5 @@ import java.util.List;
 @Getter
 public class AccountCollectionResponse {
     private List<SingleAccountResponse> content;
-    private Long totalAccounts;
+    private Long totalElements;
 }

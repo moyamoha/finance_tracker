@@ -1,11 +1,13 @@
 package com.finance_tracker.controller;
 
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.authentication.CustomUserDetails;
 import com.finance_tracker.dto.filter.BudgetFilterRequest;
 import com.finance_tracker.dto.requests.budget.CreateBudgetRequest;
 import com.finance_tracker.dto.requests.budget.EditBudgetRequest;
 import com.finance_tracker.dto.responses.CollectionResponse;
 import com.finance_tracker.dto.responses.budget.BudgetResponse;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/budget")
+@RequestMapping("/budgets")
 @Tag(name = "Budgets")
 @SecurityRequirement(name = "bearerAuth")
 public class BudgetController {
@@ -29,6 +31,7 @@ public class BudgetController {
     }
 
     @PostMapping("/")
+    @Auditable(actionType = "CREATE_BUDGET", resourceType = AuditResourceType.BUDGET)
     public BudgetResponse createBudget(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CreateBudgetRequest dto
@@ -54,6 +57,7 @@ public class BudgetController {
     }
 
     @PutMapping("/{id}")
+    @Auditable(actionType = "UPDATE_BUDGET", resourceType = AuditResourceType.BUDGET)
     public BudgetResponse update(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id,

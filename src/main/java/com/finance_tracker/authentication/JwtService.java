@@ -1,6 +1,8 @@
 package com.finance_tracker.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finance_tracker.dto.responses.user.ProfileResponse;
+import com.finance_tracker.entity.User;
 import com.finance_tracker.exception.authentication.InvalidOrExpiredToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -16,7 +18,7 @@ public class JwtService {
     @Value("${JWT_SECRET_KEY}")
     private String SECRET_KEY;
 
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 1 week
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -25,12 +27,13 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(ProfileResponse profile) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(profile.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claim("payload", profile)
                 .compact();
     }
 
@@ -57,5 +60,18 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String generateTokenForUser(User user) {
+        ProfileResponse prof = new ProfileResponse(
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.isMfaEnabled(),
+                user.getCurrency(),
+                user.getTimezone(),
+                user.getJoinedAt().toString()
+        );
+        return generateToken(prof);
     }
 }

@@ -3,12 +3,14 @@ package com.finance_tracker.service;
 import com.finance_tracker._shared.LocalDateRange;
 import com.finance_tracker._shared.LocalDateTimeRange;
 import com.finance_tracker._shared.Identifier;
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.dto.filter.BudgetFilterRequest;
 import com.finance_tracker.dto.requests.budget.CreateBudgetRequest;
 import com.finance_tracker.dto.requests.budget.EditBudgetRequest;
 import com.finance_tracker.dto.responses.CollectionResponse;
 import com.finance_tracker.dto.responses.budget.BudgetResponse;
 import com.finance_tracker.entity.*;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.enums.BudgetPeriod;
 import com.finance_tracker.enums.TransactionType;
 import com.finance_tracker.events.budget.events.BudgetUpdatedEvent;
@@ -27,13 +29,17 @@ import com.finance_tracker.service.validators.BudgetValidator;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -49,15 +55,17 @@ public class BudgetService {
     private final MailService mailService;
 
     @Transactional
+    @Auditable(actionType = "CREATE_BUDGET", resourceType = AuditResourceType.BUDGET)
     public BudgetResponse createBudget(User user, CreateBudgetRequest dto) {
         Account account = null;
         if (dto.getAccountId() != null) {
             account = accountService.getAccountForUserByIdOrThrow(user, dto.getAccountId());
         }
-        if (budgetRepository.existsByUserAndAccountAndCategory(
+        if (budgetRepository.existsByUserAndAccountAndCategoryAndPeriod(
                 user,
                 account,
-                dto.getCategory()
+                dto.getCategory(),
+                dto.getPeriod()
         )) {
             throw new DuplicateBudgetException();
         }
@@ -97,6 +105,14 @@ public class BudgetService {
         return BudgetMapper.toCollectionResponse(budgetRepository.findAll(specs, pageable));
     }
 
+    @Transactional
+    public List<BudgetResponse> getBudgetsForReport(User user, int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Specification<Budget> specs = Specification.allOf(BudgetSpecification.hasUserId(user.getId()));
+        Page<Budget> result = budgetRepository.findAll(specs, pageRequest);
+        return result.getContent().stream().map(BudgetMapper::toSingleResponse).toList();
+    }
+
     public Budget getBudgetByUserAndIdOrThrow(User user, UUID id) {
         return budgetRepository.findByUserAndId(user, id).orElseThrow(
                 () -> ItemNotFoundException.withIdentifierAndEntity(Budget.class, new Identifier<>(id))
@@ -104,6 +120,7 @@ public class BudgetService {
     }
 
     @Transactional
+    @Auditable(actionType = "UPDATE_BUDGET", resourceType = AuditResourceType.BUDGET)
     public BudgetResponse updateOne(User user, UUID id, EditBudgetRequest dto) {
         Budget budget = getBudgetByUserAndIdOrThrow(user, id);
         Budget original = BudgetMapper.cloneEntity(budget);

@@ -1,11 +1,13 @@
 package com.finance_tracker.controller;
 
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.authentication.CustomUserDetails;
 import com.finance_tracker.dto.requests.transaction.CreateTransactionRequest;
 import com.finance_tracker.dto.filter.TransactionFilterRequest;
 import com.finance_tracker.dto.requests.transaction.EditTransactionRequest;
 import com.finance_tracker.dto.responses.CollectionResponse;
 import com.finance_tracker.dto.responses.transaction.TransactionResponse;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +40,7 @@ public class TransactionController {
     }
 
     @PostMapping("/")
+    @Auditable(actionType = "CREATE_TRANSACTION", resourceType = AuditResourceType.TRANSACTION)
     public TransactionResponse createTransaction(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody(required = true) @Valid CreateTransactionRequest dto
@@ -55,11 +58,13 @@ public class TransactionController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @Auditable(actionType = "DELETE_TRANSACTION", resourceType = AuditResourceType.TRANSACTION)
     public void deleteTransaction(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable UUID id) {
         transactionService.deleteTransaction(userDetails.getUser(), id);
     }
 
     @PutMapping("/{id}")
+    @Auditable(actionType = "UPDATE_TRANSACTION", resourceType = AuditResourceType.TRANSACTION)
     public TransactionResponse updateTransaction(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID id,

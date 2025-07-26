@@ -14,7 +14,12 @@ import java.util.UUID;
 
 public interface BudgetRepository extends JpaRepository<Budget, UUID>, JpaSpecificationExecutor<Budget>, BudgetRepositoryCustom {
     Optional<Budget> findByUserAndId(User user, UUID id);
-    Boolean existsByUserAndAccountAndCategory(User user, Account account, TransactionCategory category);
+    Boolean existsByUserAndAccountAndCategoryAndPeriod(
+            User user,
+            Account account,
+            TransactionCategory category,
+            BudgetPeriod period
+    );
     void deleteByUser(User user);
 
     List<Budget> findByIsActive(Boolean isActive);

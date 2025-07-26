@@ -29,7 +29,12 @@ public class BudgetRepositoryImpl implements BudgetRepositoryCustom {
                         (account_id IS NULL OR account_id = :accountId) AND
                         (category IS NULL OR category = :category) AND
                         is_active = 1 AND
-                        :transactionDate BETWEEN start_date AND end_date
+                        CASE
+                            WHEN period = 'FIXED_LENGTH'
+                        THEN :transactionDate BETWEEN start_date AND end_date
+                        ELSE
+                            :transactionDate >= start_date
+                        END
                 """;
         return (List<Budget>) entityManager
                 .createNativeQuery(rawSql, Budget.class)

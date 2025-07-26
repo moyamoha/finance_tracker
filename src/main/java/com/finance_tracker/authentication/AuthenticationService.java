@@ -63,12 +63,12 @@ public class AuthenticationService {
         String authenticatedEmail = userDetails.getUsername(); // This gives you the email/username
 
         User user = userRepository.findByEmail(authenticatedEmail).get() ;
-        if (!user.getEmailConfirmed()) {
+        if (!user.isEmailConfirmed()) {
             throw new InvalidEmailOrPasswordException("Email is not confirmed yet");
         }
         user.setLastLoggedIn(LocalDateTime.now());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        if (user.getIsMfaEnabled()) {
+        if (user.isMfaEnabled()) {
             otpService.generateAndSendOtp(user);
             userRepository.save(user);
             return new MultiFactorAuthRequiredResponse(
@@ -82,7 +82,7 @@ public class AuthenticationService {
                 userRepository.save(user);
                 eventPublisher.publishEvent(new ReactivateMarkedUserEvent(user));
             }
-            String token = jwtService.generateToken(authentication.getName());
+            String token = jwtService.generateTokenForUser(user);
             return new SuccessfulLoginTokenResponse(token);
         }
     }
@@ -96,7 +96,7 @@ public class AuthenticationService {
 
         boolean isOtpCorrect = otpService.verifyOtp(user.getEmail(), dto.getOtpCode());
         if (isOtpCorrect) {
-            String token = jwtService.generateToken(user.getEmail());
+            String token = jwtService.generateTokenForUser(user);
             userRepository.save(user);
             return new SuccessfulLoginTokenResponse(token);
         } else {

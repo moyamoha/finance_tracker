@@ -1,5 +1,6 @@
 package com.finance_tracker.controller;
 
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.authentication.AuthenticationService;
 import com.finance_tracker.dto.requests.authentication.ConfirmEmailRequest;
 import com.finance_tracker.dto.requests.authentication.LoginRequest;
@@ -34,7 +35,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public void createUser(@Valid @RequestBody(required = true) CreateUserRequest dto) {
+    public void createUser(@Valid @RequestBody CreateUserRequest dto) {
         userService.createUser(dto);
     }
 
@@ -44,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public SuccessfulLoginTokenResponse verifyOtp(@Valid @RequestBody(required = true) MultiFactorAuthenticationRequest dto) {
+    public SuccessfulLoginTokenResponse verifyOtp(@Valid @RequestBody MultiFactorAuthenticationRequest dto) {
         return authService.verifyOtp(dto);
     }
 }

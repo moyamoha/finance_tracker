@@ -12,5 +12,5 @@ public class ChangeMfaSettingsRequest {
     private String password;
 
     @NotNull
-    private Boolean isMfaEnabled;
+    private boolean isMfaEnabled;
 }

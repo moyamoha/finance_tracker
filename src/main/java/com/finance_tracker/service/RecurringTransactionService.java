@@ -2,6 +2,7 @@ package com.finance_tracker.service;
 
 import com.finance_tracker._shared.Identifier;
 import com.finance_tracker._shared.LocalDateRange;
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.dto.requests.recurring_transaction.CreateRecurringTransactionRequest;
 import com.finance_tracker.dto.requests.recurring_transaction.EditRecurringTransactionRequest;
 import com.finance_tracker.dto.responses.recurring_transaction.RecurringTransactionCollectionResponse;
@@ -9,6 +10,7 @@ import com.finance_tracker.dto.responses.recurring_transaction.RecurringTransact
 import com.finance_tracker.entity.Account;
 import com.finance_tracker.entity.RecurringTransaction;
 import com.finance_tracker.entity.User;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.exception.custom.recurring_transaction.InvalidDateRangeException;
 import com.finance_tracker.exception.http.ItemNotFoundException;
 import com.finance_tracker.helpers.RecurringTransactionHelper;
@@ -18,6 +20,7 @@ import com.finance_tracker.repository.recurring_transaction.RecurringTransaction
 import com.finance_tracker.service.validators.RecurringTransactionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +34,7 @@ public class RecurringTransactionService {
     private final RecurringTransactionRepository recurringTransactionRepository;
     private final RecurringTransactionValidator validator;
 
+    @Auditable(actionType = "CREATE_RECURRING_TRANSACTION", resourceType = AuditResourceType.RECURRING_TRANSACTION)
     public RecurringTransactionResponse createRecurringTransaction(
             User user,
             CreateRecurringTransactionRequest dto
@@ -58,6 +62,8 @@ public class RecurringTransactionService {
         return RecurringTransactionMapper.toCollectionResponse(all);
     }
 
+    @Transactional
+    @Auditable(actionType = "UPDATE_RECURRING_TRANSACTION", resourceType = AuditResourceType.RECURRING_TRANSACTION)
     public RecurringTransactionResponse updateOne(User user, UUID id, EditRecurringTransactionRequest dto) {
         RecurringTransaction rt = getRecurringTransactionOrThrow(user, id);
         RecurringTransactionMapper.updateFromDto(rt, dto);
@@ -69,6 +75,7 @@ public class RecurringTransactionService {
         return RecurringTransactionMapper.toSingleResponse(rt);
     }
 
+    @Auditable(actionType = "DELETE_RECURRING_TRANSACTION", resourceType = AuditResourceType.RECURRING_TRANSACTION)
     public void deleteOne(User user, UUID id) {
         recurringTransactionRepository.deleteByUserAndId(user, id);
     }

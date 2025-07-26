@@ -26,6 +26,7 @@ public class BudgetValidator implements EntityValidator<Budget> {
     }
 
     private void validateBudgetCategoryOrThrow() {
+        if (budget.getCategory() == null) return;
         if (budget.getCategory().getTransactionType().equals(TransactionType.INCOME)) {
             throw new InvalidCategoryForBudgetException();
         }

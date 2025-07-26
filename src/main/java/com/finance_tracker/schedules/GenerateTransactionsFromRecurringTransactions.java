@@ -1,6 +1,8 @@
 package com.finance_tracker.schedules;
 
+import com.finance_tracker.annotations.Auditable;
 import com.finance_tracker.entity.RecurringTransaction;
+import com.finance_tracker.enums.AuditResourceType;
 import com.finance_tracker.helpers.RecurringTransactionHelper;
 import com.finance_tracker.repository.recurring_transaction.RecurringTransactionRepository;
 import com.finance_tracker.service.RecurringTransactionService;
@@ -16,11 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenerateTransactionsFromRecurringTransactions {
 
+    private final static String ACTION_TYPE = "GENERATE_TRANSACTIONS_FROM_RECURRING_TRANSACTION";
     private final TransactionService transactionService;
     private final RecurringTransactionRepository recurringTransactionRepository;
     private final RecurringTransactionService recurringTransactionService;
 
     @Scheduled(cron = "0 0 4 * * *")
+    @Auditable(actionType = ACTION_TYPE, includeResult = false, includeArgs = false, resourceType = AuditResourceType.TRANSACTION)
     public void handle() {
         LocalDate today = LocalDate.now();
         List<RecurringTransaction> eligible = recurringTransactionService.getByNextGenerationDate(today);

@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user_id", "account_id", "category" })
+        @UniqueConstraint(columnNames = { "user_id", "account_id", "category", "period" })
 })
 public class Budget {
 

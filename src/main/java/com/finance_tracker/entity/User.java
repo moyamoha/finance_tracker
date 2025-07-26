@@ -34,8 +34,13 @@ public class User {
     private LocalDateTime joinedAt;
     private LocalDateTime lastLoggedIn;
     private LocalDateTime markedInactiveAt;
-    private Boolean isMfaEnabled = false;
-    private Boolean emailConfirmed = false;
+
+    @Column(nullable = false)
+    private boolean mfaEnabled = false;
+
+    @Column(nullable = false)
+    private boolean emailConfirmed = false;
+
     private String currency;
     private String timezone;
 

@@ -21,4 +21,7 @@ public enum BudgetPeriod {
         return this.name().equals(BudgetPeriod.FIXED_LENGTH.name());
     }
 
+    public boolean isPeriodic() {
+        return !this.name().equals(BudgetPeriod.FIXED_LENGTH.name());
+    }
 }

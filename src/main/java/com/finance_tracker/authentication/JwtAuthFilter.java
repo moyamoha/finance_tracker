@@ -49,6 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        logger.info("CALLED");
 
         String path = request.getRequestURI();
         String[] allowedPaths = {"/auth/", "/swagger-ui/", "/v3/api-docs/", "/app"};
